@@ -45,7 +45,7 @@ func redirect(twitterService services.TwitterService, jwtService services.JWTSer
 			return
 		}
 
-		user, err := userService.Create(c, twitterUser)
+		user, err := userService.CreateOrSelect(c, twitterUser)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return

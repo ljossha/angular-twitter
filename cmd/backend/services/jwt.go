@@ -10,20 +10,19 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// JWTService provides a Json-Web-Token authentication interface
+// JWTService provides a jwt service interface
 type JWTService interface {
 	ParseToken(authHeader string) (*jwt.Token, error)
 	GenerateToken(u *models.User) (string, error)
 }
 
-// jwtService provides a Json-Web-Token authentication implementation
 type jwtService struct {
 	key  []byte
 	ttl  time.Duration
 	algo jwt.SigningMethod
 }
 
-// NewJWTService generates new JWT necessary for auth middleware
+// NewJWTService returns instance of jwt service
 func NewJWTService() JWTService {
 	return &jwtService{
 		key:  []byte(config.JWTSecret()),

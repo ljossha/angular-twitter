@@ -8,10 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// TwitterService provides a twitter service interface
 type TwitterService interface {
 	Login() (string, error)
 	GetUser(ctx *gin.Context) (*twitter.User, error)
-	GetTweets() ([]twitter.Tweet, error)
 	FindUserByName(name string) (*twitter.User, error)
 	FindUserByID(id int64) (*twitter.User, error)
 	GetTweetsByUserID(id int64) ([]twitter.Tweet, error)
@@ -22,6 +22,7 @@ type twitterService struct {
 	client       *twitter.Client
 }
 
+// NewTwitterService returns instance of twitter service
 func NewTwitterService() TwitterService {
 	clientConfig := &oauth1.Config{
 		ConsumerKey:    config.TwitterConsumerKey(),
@@ -39,6 +40,7 @@ func NewTwitterService() TwitterService {
 	}
 }
 
+// Login returns link to oAuth login
 func (s *twitterService) Login() (string, error) {
 	requestToken, _, err := s.oauth1Config.RequestToken()
 	if err != nil {
@@ -53,6 +55,7 @@ func (s *twitterService) Login() (string, error) {
 	return authorizationURL.String(), nil
 }
 
+// GetUser returns twitter from context
 func (s *twitterService) GetUser(ctx *gin.Context) (*twitter.User, error) {
 	requestToken, verifier, err := oauth1.ParseAuthorizationCallback(ctx.Request)
 	if err != nil {
@@ -79,17 +82,7 @@ func (s *twitterService) GetUser(ctx *gin.Context) (*twitter.User, error) {
 	return user, nil
 }
 
-func (s *twitterService) GetTweets() ([]twitter.Tweet, error) {
-	search, _, err := s.client.Search.Tweets(&twitter.SearchTweetParams{
-		Query: "Golang",
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return search.Statuses, err
-}
-
+// FindUserByName returns twitter user by name
 func (s *twitterService) FindUserByName(name string) (*twitter.User, error) {
 	user, _, err := s.client.Users.Show(&twitter.UserShowParams{
 		ScreenName: name,
@@ -101,6 +94,7 @@ func (s *twitterService) FindUserByName(name string) (*twitter.User, error) {
 	return user, nil
 }
 
+// FindUserByID returns twitter user by id
 func (s *twitterService) FindUserByID(id int64) (*twitter.User, error) {
 	user, _, err := s.client.Users.Show(&twitter.UserShowParams{
 		UserID: id,
@@ -112,6 +106,7 @@ func (s *twitterService) FindUserByID(id int64) (*twitter.User, error) {
 	return user, nil
 }
 
+// GetTweetsByUserID returns tweets by user id
 func (s *twitterService) GetTweetsByUserID(id int64) ([]twitter.Tweet, error) {
 	userTimeLine, _, err := s.client.Timelines.UserTimeline(&twitter.UserTimelineParams{
 		UserID: id,
