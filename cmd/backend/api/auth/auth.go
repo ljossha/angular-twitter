@@ -2,6 +2,7 @@ package auth
 
 import (
 	"angular-twitter/cmd/backend/services"
+	"angular-twitter/cmd/backend/setup"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -12,6 +13,7 @@ func InjectAuth(gr *gin.RouterGroup, twitterService services.TwitterService, jwt
 
 	handler.GET("/login", oauthLink(twitterService))
 	handler.POST("/login", redirect(twitterService, jwtService, userService))
+	handler.GET("/me", setup.AuthMiddleware(jwtService), me())
 }
 
 type oAuthLinkResponse struct {
@@ -70,5 +72,11 @@ func redirect(twitterService services.TwitterService, jwtService services.JWTSer
 		c.JSON(http.StatusOK, tokenResponse{
 			Token: token,
 		})
+	}
+}
+
+func me() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Status(http.StatusOK)
 	}
 }

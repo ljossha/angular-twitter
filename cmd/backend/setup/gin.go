@@ -16,6 +16,7 @@ func HTTPServer() *gin.Engine {
 	serveWebApp(handler)
 
 	handler.Use(gin.Recovery())
+	handler.Use(gin.Logger())
 
 	handler.Use(func(context *gin.Context) {
 		context.Writer.Header().Set("Access-Control-Allow-Origin", "*")

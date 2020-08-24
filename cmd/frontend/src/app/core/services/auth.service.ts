@@ -13,7 +13,16 @@ export class AuthService {
   ) {}
 
   populate(): void {
-    if (this.localStorageService.get(Keys.BearerToken) === null) {
+    let token = this.localStorageService.get(Keys.BearerToken);
+    // If already expired -> delete from storage and populate login.
+    if (token !== null) {
+      this.me().subscribe(() => {}, () => {
+        this.localStorageService.delete(Keys.BearerToken);
+        token = null;
+      });
+    }
+
+    if (token === null) {
       this.login().subscribe(x => {
         window.location.assign(x.url);
       });
@@ -22,6 +31,10 @@ export class AuthService {
 
   login(): Observable<any> {
     return this.apiService.get('/auth/login');
+  }
+
+  me(): Observable<any> {
+    return this.apiService.get('/auth/me');
   }
 
   handleoAuth(oauthToken: string, oauthVerifier: string): Observable<any> {

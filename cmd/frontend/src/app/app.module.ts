@@ -16,13 +16,16 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {HttpTokenInterceptor} from './core/services/http.token.interceptor';
-import {AddSubscriptionDialog} from './home/add-streamer/add-subscription-dialog.component';
+import {AddSubscriptionDialogComponent} from './home/add-subscription/add-subscription-dialog.component';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {FormsModule} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {LocalStorageService, UserService, ApiService, AuthService} from './core/services';
 import {NgxSpinnerModule} from 'ngx-spinner';
+import {SubscriptionService} from './core/services/subscription.service';
+import {TweetService} from './core/services/tweet.service';
+import {MatCardModule} from '@angular/material/card';
 
 @NgModule({
   declarations: [
@@ -30,7 +33,7 @@ import {NgxSpinnerModule} from 'ngx-spinner';
     RedirectComponent,
     HomeComponent,
     SafePipe,
-    AddSubscriptionDialog,
+    AddSubscriptionDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -49,6 +52,7 @@ import {NgxSpinnerModule} from 'ngx-spinner';
     MatInputModule,
     FormsModule,
     NgxSpinnerModule,
+    MatCardModule,
   ],
   providers: [
     UserService,
@@ -56,6 +60,8 @@ import {NgxSpinnerModule} from 'ngx-spinner';
     HttpClient,
     LocalStorageService,
     AuthService,
+    SubscriptionService,
+    TweetService,
     { provide: HTTP_INTERCEPTORS, useClass: HttpTokenInterceptor, multi: true },
     MatSnackBar,
   ],
