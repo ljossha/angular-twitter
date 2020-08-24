@@ -18,9 +18,17 @@ func HTTPServer() *gin.Engine {
 	handler.Use(gin.Recovery())
 
 	handler.Use(func(context *gin.Context) {
-		context.Header("Access-Control-Allow-Origin", "*")
-		context.Header("Access-Control-Allow-Headers", "*")
-		context.Header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS")
+		context.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		context.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		context.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		context.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
+
+		if context.Request.Method == "OPTIONS" {
+			context.AbortWithStatus(204)
+			return
+		}
+
+		context.Next()
 	})
 
 	return handler

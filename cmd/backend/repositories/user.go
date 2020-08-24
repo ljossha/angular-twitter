@@ -19,7 +19,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 func (s *userRepository) CreateOrSelect(ctx context.Context, user *models.User) (*models.User, error) {
-	err := s.db.Where("email", user.Email).First(user).Error
+	err := s.db.Where("email = ?", user.Email).First(user).Error
 	if err == nil {
 		return user, nil
 	}

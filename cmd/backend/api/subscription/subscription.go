@@ -37,7 +37,7 @@ func subscribe(twitterService services.TwitterService, subscriptionService servi
 			return
 		}
 
-		err = subscriptionService.AddSubscription(c, authorizedUser.GetUserID(), twitterUser.ID)
+		err = subscriptionService.AddSubscription(c, authorizedUser.ID, twitterUser.ID)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
@@ -51,7 +51,7 @@ func list(twitterService services.TwitterService, subscriptionService services.S
 	return func(c *gin.Context) {
 		authorizedUser := services.GetUser(c)
 
-		subscriptions, err := subscriptionService.List(c, authorizedUser.GetUserID())
+		subscriptions, err := subscriptionService.List(c, authorizedUser.ID)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return
@@ -85,7 +85,7 @@ func unSubscribe(twitterService services.TwitterService, subscriptionService ser
 			return
 		}
 
-		err = subscriptionService.RemoveSubscription(c, authorizedUser.GetUserID(), twitterUser.ID)
+		err = subscriptionService.RemoveSubscription(c, authorizedUser.ID, twitterUser.ID)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
 			return

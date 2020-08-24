@@ -11,8 +11,7 @@ func InjectAuth(gr *gin.RouterGroup, twitterService services.TwitterService, jwt
 	handler := gr.Group("auth")
 
 	handler.GET("/login", oauthLink(twitterService))
-	handler.GET("/login/redirect", redirect(twitterService, jwtService, userService))
-	handler.GET("/logout", logout(twitterService))
+	handler.POST("/login", redirect(twitterService, jwtService, userService))
 }
 
 type oAuthLinkResponse struct {
@@ -37,9 +36,20 @@ type tokenResponse struct {
 	Token string `json:"token"`
 }
 
+type redirectRequest struct {
+	Token string `json:"oauth_token"`
+	Verifier string `json:"oauth_verifier"`
+}
+
 func redirect(twitterService services.TwitterService, jwtService services.JWTService, userService services.UserService) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		twitterUser, err := twitterService.GetUser(c)
+		var req redirectRequest
+		if err := c.Bind(&req); err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+
+		twitterUser, err := twitterService.GetUser(c, req.Token, req.Verifier)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
@@ -60,18 +70,5 @@ func redirect(twitterService services.TwitterService, jwtService services.JWTSer
 		c.JSON(http.StatusOK, tokenResponse{
 			Token: token,
 		})
-	}
-}
-
-func logout(twitterService services.TwitterService) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		tweets, err := twitterService.GetTweets()
-		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
-			return
-		}
-
-		c.JSON(http.StatusOK, tweets)
-		return
 	}
 }

@@ -6,8 +6,3 @@ type User struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
-
-// GetUserID returns ID of user, to make rbac service not depended to DAL
-func (u *User) GetUserID() int64 {
-	return u.ID
-}

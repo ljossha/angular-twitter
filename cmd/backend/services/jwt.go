@@ -1,7 +1,6 @@
 package services
 
 import (
-	"angular-twitter/cmd/backend/models"
 	"angular-twitter/common/config"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -13,7 +12,7 @@ import (
 // JWTService provides a jwt service interface
 type JWTService interface {
 	ParseToken(authHeader string) (*jwt.Token, error)
-	GenerateToken(u *models.User) (string, error)
+	GenerateToken(u *UserDTO) (string, error)
 }
 
 type jwtService struct {
@@ -42,7 +41,7 @@ func (s *jwtService) ParseToken(token string) (*jwt.Token, error) {
 }
 
 // GenerateToken generates new JWT token and populates it with user data
-func (s *jwtService) GenerateToken(u *models.User) (string, error) {
+func (s *jwtService) GenerateToken(u *UserDTO) (string, error) {
 	return jwt.NewWithClaims(s.algo, jwt.MapClaims{
 		"id":  u.ID,
 		"u":   u.Name,
@@ -51,18 +50,13 @@ func (s *jwtService) GenerateToken(u *models.User) (string, error) {
 	}).SignedString(s.key)
 }
 
-// AuthorizedUser interface of DAL user model
-type AuthorizedUser interface {
-	GetUserID() int64
-}
-
 // GetUser returns the interface of authorized user
-func GetUser(c *gin.Context) AuthorizedUser {
+func GetUser(c *gin.Context) *UserDTO {
 	id, _ := c.Get("id")
 	name, _ := c.Get("name")
 	email, _ := c.Get("email")
 
-	return &models.User{
+	return &UserDTO{
 		ID:    int64(id.(float64)),
 		Name:  name.(string),
 		Email: email.(string),

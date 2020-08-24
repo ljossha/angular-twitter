@@ -11,7 +11,7 @@ import (
 // TwitterService provides a twitter service interface
 type TwitterService interface {
 	Login() (string, error)
-	GetUser(ctx *gin.Context) (*twitter.User, error)
+	GetUser(ctx *gin.Context, requestToken string, verifier string) (*twitter.User, error)
 	FindUserByName(name string) (*twitter.User, error)
 	FindUserByID(id int64) (*twitter.User, error)
 	GetTweetsByUserID(id int64) ([]twitter.Tweet, error)
@@ -27,7 +27,7 @@ func NewTwitterService() TwitterService {
 	clientConfig := &oauth1.Config{
 		ConsumerKey:    config.TwitterConsumerKey(),
 		ConsumerSecret: config.TwitterConsumerSecret(),
-		CallbackURL:    "http://localhost:8080/v1/api/auth/login/redirect",
+		CallbackURL:    "http://localhost:4200/redirect",
 		Endpoint:       twitterOauth.AuthorizeEndpoint,
 	}
 	token := oauth1.NewToken(config.AccessKey(), config.AccessTokenSecret())
@@ -56,12 +56,7 @@ func (s *twitterService) Login() (string, error) {
 }
 
 // GetUser returns twitter from context
-func (s *twitterService) GetUser(ctx *gin.Context) (*twitter.User, error) {
-	requestToken, verifier, err := oauth1.ParseAuthorizationCallback(ctx.Request)
-	if err != nil {
-		return nil, err
-	}
-
+func (s *twitterService) GetUser(ctx *gin.Context, requestToken string, verifier string) (*twitter.User, error) {
 	accessToken, accessSecret, err := s.oauth1Config.AccessToken(requestToken, s.oauth1Config.ConsumerSecret, verifier)
 	if err != nil {
 		return nil, err
